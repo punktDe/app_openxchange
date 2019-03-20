@@ -1,0 +1,19 @@
+---
+- name: Ensure MariaDB repo-key is present
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: F1656F24C74CD1D8
+
+- name: Ensure repositories are included
+  copy:
+    src: files/packages/
+    dest: /etc/apt/sources.list.d/
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure packages are installed
+  apt:
+    name:
+      - mariadb-server
+    update_cache: yes

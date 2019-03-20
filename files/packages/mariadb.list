@@ -1,0 +1,4 @@
+# MariaDB 10.3 repository list - created 2019-03-20 15:51 UTC
+# http://downloads.mariadb.org/mariadb/repositories/
+deb [arch=amd64] http://mirror2.hs-esslingen.de/mariadb/repo/10.3/ubuntu bionic main
+deb-src http://mirror2.hs-esslingen.de/mariadb/repo/10.3/ubuntu bionic main
