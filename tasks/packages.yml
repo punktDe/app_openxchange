@@ -4,6 +4,11 @@
     keyserver: keyserver.ubuntu.com
     id: F1656F24C74CD1D8
 
+- name: Ensure OpenXChange repo-key is present
+  apt_key:
+    url: http://software.open-xchange.com/oxbuildkey.pub
+    state: present
+
 - name: Ensure repositories are included
   copy:
     src: files/packages/
@@ -16,4 +21,11 @@
   apt:
     name:
       - mariadb-server
+      - open-xchange
+      - open-xchange-authentication-database
+      - open-xchange-grizzly
+      - open-xchange-admin
+      - open-xchange-appsuite
+      - open-xchange-appsuite-backend
+      - open-xchange-appsuite-manifest
     update_cache: yes
