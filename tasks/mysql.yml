@@ -1,0 +1,30 @@
+---
+- name: Ensure root password file exists
+  shell: pwgen -s 32 1 | tee /usr/local/etc/mysql-password
+  args:
+    creates: /usr/local/etc/mysql-password
+  register: mysql_password
+
+- name: Ensure root password file has restrictive access rights
+  file:
+    path: /usr/local/etc/mysql-password
+    owner: root
+    group: adm
+    mode: 0600
+
+- name: Ensure mysql service is started and enabled
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: Ensure database root password is set
+  mysql_user:
+    name: root
+    password: "{{ mysql_password.stdout }}"
+    login_user: root
+    login_password: "{{ mysql_password.stdout }}"
+    check_implicit_admin: yes
+  when: mysql_password.changed
+
+
