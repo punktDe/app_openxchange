@@ -20,7 +20,6 @@
         path: /usr/local/etc/ox-init
         owner: root
         group: root
-        # when specifying mode using octal numbers, add a leading 0
         mode: 0644
         state: touch
   when: initialized.stat.exists == False
