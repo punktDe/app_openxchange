@@ -40,3 +40,18 @@
         mode: 0644
         state: touch
   when: initialized.stat.exists == False
+
+- name: Ensure mail properties file is put into place
+  template:
+    src: templates/ox/mail-proserties.j2
+    dest: open-xchange/etc/mail.properties
+    owner: root
+    group: open-xchange
+    mode: 0640
+
+- name: Ensure OpenXChange is restarted
+  service:
+    name: open-xchange
+    state: restarted
+
+
