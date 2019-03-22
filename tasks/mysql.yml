@@ -27,7 +27,3 @@
     check_implicit_admin: yes
   when: mysql_password.changed
 
-- name: read mysql root password
-  slurp:
-    src: /usr/local/etc/mysql-password
-  register: mysql_root_password
