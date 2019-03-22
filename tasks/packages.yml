@@ -19,15 +19,17 @@
 
 - name: Ensure packages are installed
   apt:
-    name:
-      - mariadb-server
-      - mariadb-client
-      - python3-pymysql
-      - open-xchange
-      - open-xchange-authentication-database
-      - open-xchange-grizzly
-      - open-xchange-admin
-      - open-xchange-appsuite
-      - open-xchange-appsuite-backend
-      - open-xchange-appsuite-manifest
+    name: "{{ packages }}"
     update_cache: yes
+  vars:
+    packages:
+    - mariadb-server
+    - mariadb-client
+    - python3-pymysql
+    - open-xchange
+    - open-xchange-authentication-database
+    - open-xchange-grizzly
+    - open-xchange-admin
+    - open-xchange-appsuite
+    - open-xchange-appsuite-backend
+    - open-xchange-appsuite-manifest
