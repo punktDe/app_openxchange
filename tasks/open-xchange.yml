@@ -5,6 +5,7 @@
   register: initialized
 
 - block:
+    # this had to be done becaue the ox initializing-scripts are not idemptent
     - name: read mysql root password
       slurp:
         src: /usr/local/etc/mysql-password
@@ -23,4 +24,3 @@
         mode: 0644
         state: touch
   when: initialized.stat.exists == False
-  # this had to be done becaue the initializing scripts are not idemptent
