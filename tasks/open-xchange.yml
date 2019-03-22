@@ -1,0 +1,26 @@
+---
+- name: read mysql root password
+  slurp:
+    src: /usr/local/etc/mysql-password
+  register: mysql_root_password
+
+- name: check initialization
+  stat:
+    path: /usr/local/etc/ox-init
+  register: initialized
+
+- block:
+    - name: Ensure the configdb database is initialized
+      command: |
+              /opt/open-xchange/sbin/initconfigdb -i --configdb-pass {{ ubuntu.ox.mysql.user.oxuser.password }}
+              --mysql-root-passwd {{ mysql_root_password['content'] | b64decode | replace('\n', '') }}
+
+    - name: touch file to indicate initialization
+      file:
+        path: /usr/local/etc/ox-init
+        owner: root
+        group: root
+        # when specifying mode using octal numbers, add a leading 0
+        mode: 0644
+        state: touch
+  when: initialized.stat.exists == False
