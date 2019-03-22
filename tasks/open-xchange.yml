@@ -13,24 +13,72 @@
 
     - name: Ensure the configdb database is initialized
       command: |
-              /opt/open-xchange/sbin/initconfigdb -i -a --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
+              /opt/open-xchange/sbin/initconfigdb
+              -i
+              -a
+              --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
               --mysql-root-passwd={{ mysql_root_password['content'] | b64decode | replace('\n', '') }}
 
     - name: Ensure OpenXChange is configured without a license
       command: |
-              /opt/open-xchange/sbin/oxinstaller --no-license --servername={{ inventory_hostname }}
+              /opt/open-xchange/sbin/oxinstaller
+              --no-license --servername={{ inventory_hostname }}
               --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
-              --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }} --network-listener-host=localhost
+              --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }}
+              --network-listener-host=localhost
               --servermemory "{{ ubuntu.ox.java.vm.memory}}"
       when: ubuntu.ox.license is undefined
 
     - name: Ensure OpenXChange is configured with license
       command: |
-              /opt/open-xchange/sbin/oxinstaller --add-license={{ ubuntu.ox.license.code }}
-              --servername={{ inventory_hostname }} --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
-              --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }} --network-listener-host=localhost
+              /opt/open-xchange/sbin/oxinstaller
+              --add-license={{ ubuntu.ox.license.code }}
+              --servername={{ inventory_hostname }}
+              --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
+              --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }}
+              --network-listener-host=localhost
               --servermemory "{{ ubuntu.ox.java.vm.memory}}"
       when: ubuntu.ox.license is defined
+  when: initialized.stat.exists == False
+
+- name: Ensure mail properties file is put into place
+  template:
+    src: ox/mail.properties.j2
+    dest: /opt/open-xchange/etc/mail.properties
+    owner: root
+    group: open-xchange
+    mode: 0640
+  register: mail_properties
+
+- name: Ensure OpenXChange is restarted
+  service:
+    name: open-xchange
+    state: restarted
+  when: mail_properties is changed
+
+- name: Ensure filestore is created
+  file:
+    path: "{{ ubuntu.ox.filestore.path }}"
+    owner: open-xchange
+    group: open-xchange
+    mode: 0664
+    state: directory
+
+- block:
+    - name: Ensure the ox-server is registered in the config db
+      command: |
+              /opt/open-xchange/sbin/registerserver
+              -n {{ inventory_hostname }}
+              -A {{ ubuntu.ox.user['oxadminmaster'].name }}
+              -P {{ ubuntu.ox.user['oxadminmaster'].password}}
+
+    - name: Ensure filestore is registered
+      command: |
+              /opt/open-xchange/sbin/registerfilestore
+              -A {{ ubuntu.ox.user['oxadminmaster'].name }}
+              -P {{ ubuntu.ox.user['oxadminmaster'].password}}
+              -t file:{{ ubuntu.ox.filestore.path }}
+              -s {{ ubuntu.ox.filestore.size }}
 
     - name: touch file to indicate initialization
       file:
@@ -40,18 +88,3 @@
         mode: 0644
         state: touch
   when: initialized.stat.exists == False
-
-- name: Ensure mail properties file is put into place
-  template:
-    src: templates/ox/mail-proserties.j2
-    dest: open-xchange/etc/mail.properties
-    owner: root
-    group: open-xchange
-    mode: 0640
-
-- name: Ensure OpenXChange is restarted
-  service:
-    name: open-xchange
-    state: restarted
-
-
