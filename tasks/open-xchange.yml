@@ -26,7 +26,7 @@
 
     - name: Ensure OpenXChange is configured with license
       command: |
-              /opt/open-xchange/sbin/oxinstaller --add-license=YOUR-OX-LICENSE-CODE
+              /opt/open-xchange/sbin/oxinstaller --add-license={{ ubuntu.ox.license.code }}
               --servername={{ inventory_hostname }} --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
               --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }} --network-listener-host=localhost
               --servermemory "{{ ubuntu.ox.java.vm.memory}}"
