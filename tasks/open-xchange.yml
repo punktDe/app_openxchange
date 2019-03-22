@@ -1,15 +1,15 @@
 ---
-- name: read mysql root password
-  slurp:
-    src: /usr/local/etc/mysql-password
-  register: mysql_root_password
-
 - name: check initialization
   stat:
     path: /usr/local/etc/ox-init
   register: initialized
 
 - block:
+    - name: read mysql root password
+      slurp:
+        src: /usr/local/etc/mysql-password
+      register: mysql_root_password
+
     - name: Ensure the configdb database is initialized
       command: |
               /opt/open-xchange/sbin/initconfigdb -i --configdb-pass {{ ubuntu.ox.mysql.user.oxuser.password }}
@@ -23,3 +23,4 @@
         mode: 0644
         state: touch
   when: initialized.stat.exists == False
+  # this had to be done becaue the initializing scripts are not idemptent
