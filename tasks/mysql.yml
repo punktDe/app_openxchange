@@ -32,15 +32,13 @@
     src: /usr/local/etc/mysql-password
   register: mysql_root_password
 
-- name: Ensure OpenXChange database users are created
+- name: Ensure OpenXChange database user is created
   mysql_user:
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
+    name: "{{ ubuntu.ox.mysql.user.oxuser.name }}"
+    password: "{{ ubuntu.ox.mysql.user.oxuser.password }}"
+    priv: "{{ ubuntu.ox.mysql.user.oxuser.priviledges }}"
     login_user: root
     login_password: "{{ mysql_root_password['content'] | b64decode | replace('\n', '')}}"
-  loop: "{{ ubuntu.ox.mysql.user }}"
-  loop_control:
-    label: "{{ item.name }}"
 
 
 
