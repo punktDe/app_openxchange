@@ -65,12 +65,12 @@
     state: directory
 
 - block:
-    - name: Ensure the ox-server is registered in the config db
-      command: |
-              /opt/open-xchange/sbin/registerserver
-              -n {{ inventory_hostname }}
-              -A {{ ubuntu.ox.user['oxadminmaster'].name }}
-              -P {{ ubuntu.ox.user['oxadminmaster'].password}}
+     - name: Ensure the ox-server is registered in the config db
+       command: |
+               /opt/open-xchange/sbin/registerserver
+               -n {{ inventory_hostname }}
+               -A {{ ubuntu.ox.user['oxadminmaster'].name }}
+               -P {{ ubuntu.ox.user['oxadminmaster'].password}}
 
     - name: Ensure filestore is registered
       command: |
@@ -79,6 +79,16 @@
               -P {{ ubuntu.ox.user['oxadminmaster'].password}}
               -t file:{{ ubuntu.ox.filestore.path }}
               -s {{ ubuntu.ox.filestore.size }}
+
+    - name: Ensure groupware database context is registered
+      command: |
+              /opt/open-xchange/sbin/registerdatabase
+              -A {{ ubuntu.ox.user['oxadminmaster'].name }}
+              -P {{ ubuntu.ox.user['oxadminmaster'].password}}
+              -n {{ item.name }}
+              -p {{ item.password }}
+              -m true
+      loop: "{{ ubuntu.ox.db.contexts|dict2items }}"
 
     - name: touch file to indicate initialization
       file:
