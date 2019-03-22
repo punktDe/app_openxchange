@@ -5,7 +5,7 @@
   register: initialized
 
 - block:
-    # this had to be done becaue the ox initializing-scripts are not idemptent
+    # this had to be done because the ox initializing-scripts are not idempotent
     - name: read mysql root password
       slurp:
         src: /usr/local/etc/mysql-password
@@ -13,8 +13,24 @@
 
     - name: Ensure the configdb database is initialized
       command: |
-              /opt/open-xchange/sbin/initconfigdb -i --configdb-pass {{ ubuntu.ox.mysql.user.oxuser.password }}
-              --mysql-root-passwd {{ mysql_root_password['content'] | b64decode | replace('\n', '') }}
+              /opt/open-xchange/sbin/initconfigdb -i -a --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
+              --mysql-root-passwd={{ mysql_root_password['content'] | b64decode | replace('\n', '') }}
+
+    - name: Ensure OpenXChange is configured without a license
+      command: |
+              /opt/open-xchange/sbin/oxinstaller --no-license --servername={{ inventory_hostname }}
+              --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
+              --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }} --network-listener-host=localhost
+              --servermemory "{{ ubuntu.ox.java.vm.memory}}"
+      when: ubuntu.ox.license is undefined
+
+    - name: Ensure OpenXChange is configured with license
+      command: |
+              /opt/open-xchange/sbin/oxinstaller --add-license=YOUR-OX-LICENSE-CODE
+              --servername={{ inventory_hostname }} --configdb-pass={{ ubuntu.ox.user['oxuser'].password }}
+              --master-pass={{ ubuntu.ox.user['oxadminmaster'].password }} --network-listener-host=localhost
+              --servermemory "{{ ubuntu.ox.java.vm.memory}}"
+      when: ubuntu.ox.license is defined
 
     - name: touch file to indicate initialization
       file:
