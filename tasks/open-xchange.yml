@@ -65,8 +65,8 @@
     state: directory
 
 - block:
-     - name: Ensure the ox-server is registered in the config db
-       command: |
+    - name: Ensure the ox-server is registered in the config db
+      command: |
                /opt/open-xchange/sbin/registerserver
                -n {{ inventory_hostname }}
                -A {{ ubuntu.ox.user['oxadminmaster'].name }}
