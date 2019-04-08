@@ -1,12 +1,12 @@
 {{ ansible_managed }}
 com.openexchange.mail.loginSource=login
 com.openexchange.mail.passwordSource=session
-com.openexchange.mail.mailServerSource=user
-com.openexchange.mail.transportServerSource=user
+com.openexchange.mail.mailServerSource=global
+com.openexchange.mail.transportServerSource=global
 com.openexchange.mail.masterPassword=secret
-com.openexchange.mail.mailServer=oxbox
+com.openexchange.mail.mailServer={{ ubuntu.ox.mail.imap_server }}
 com.openexchange.mail.mailStartTls=false
-com.openexchange.mail.transportServer=oxbox
+com.openexchange.mail.transportServer={{ ubuntu.ox.mail.smtp_server }}
 com.openexchange.mail.transportStartTls=false
 com.openexchange.mail.defaultMailProvider=imap
 mail.mime.charset=UTF-8
